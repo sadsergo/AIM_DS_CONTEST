@@ -15,15 +15,7 @@ from concurrent.futures import ProcessPoolExecutor
         7. И так очень много много раз
         8. Возвращаем счетчик 
         9. .....очень долго (((
-
-    Улучшенный:
-        1. Пусть C = всевозможные комбинации столбцов, пусть P = количество процессов, тогда N = C / P - это сколько каждый процесс должен проверить комбинаций
-        2. Должно ускориться
 """
-
-
-def work(matrix : np.array, pid : int, start : int, finish : int, result : list):
-    pass
 
 
 def number_of_patterns(matrix: np.ndarray) -> int:
@@ -57,7 +49,7 @@ def number_of_patterns(matrix: np.ndarray) -> int:
                     continue
 
                 used_rows.add(tuple(row))
-                #! np.where((submatrix == row).all(axis=1))[0]
+
                 if not np.any(np.all(submatrix == row, axis=1)):
                     has_pattern = True
 
