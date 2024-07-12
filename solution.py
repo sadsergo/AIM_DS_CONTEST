@@ -21,53 +21,51 @@ from concurrent.futures import ProcessPoolExecutor
 def number_of_patterns(matrix: np.ndarray) -> int:
     num = 0
     n, m = matrix.shape
+    main_arange = np.arange(0, m)
 
-    for cols in range(1, 2**m):
-        bin_list = np.fromstring(bin(cols)[2:], dtype=np.int8) - 48
-        bin_cols = np.where(
-            np.pad(bin_list, pad_width=(m - bin_list.shape[0], 0), mode="constant") == 1
-        )[0]
+    for cols in range(1, m + 1):
+        for bin_cols in combinations(main_arange, cols):
+            submatrix = matrix[:, bin_cols]
+            _, sub_m = submatrix.shape
+            sub_arange = np.arange(0, sub_m)
 
-        submatrix = matrix[:, bin_cols]
-        _, sub_m = submatrix.shape
+            #   Если подматрица состоит из одного столбца, то если столбец из одинаковых значений, то это закономерность
+            #   Если из нескольких, то обрабатываем как написано в начале файла
 
-        #   Если подматрица состоит из одного столбца, то если столбец из одинаковых значений, то это закономерность
-        #   Если из нескольких, то обрабатываем как написано в начале файла
-        
-        if sub_m == 1:
-            num += np.unique(submatrix).shape[0] == 1
-            continue
+            if sub_m == 1:
+                num += np.unique(submatrix).shape[0] == 1
+                continue
 
-        used_rows = set()
+            used_rows = set()
 
-        for i in range(n):
-            for k in range(sub_m):
-                row = submatrix[i, :].copy()
-                row[k] ^= 1
+            for i in range(n):
+                for k in range(sub_m):
+                    row = submatrix[i, :].copy()
+                    row[k] ^= 1
 
-                if tuple(row) in used_rows:
-                    continue
+                    if tuple(row) in used_rows:
+                        continue
 
-                used_rows.add(tuple(row))
+                    used_rows.add(tuple(row))
 
-                if not np.any(np.all(submatrix == row, axis=1)):
-                    has_pattern = True
+                    if not np.any(np.all(submatrix == row, axis=1)):
+                        has_pattern = True
 
-                    for cols_count in range(1, sub_m):
-                        for comb_cols in combinations(np.arange(0, sub_m), cols_count):
-                            if not np.any(
-                                np.all(
-                                    submatrix[:, comb_cols] == row[np.array(comb_cols)],
-                                    axis=1,
-                                )
-                            ):
-                                has_pattern = False
+                        for cols_count in range(1, sub_m):
+                            for comb_cols in combinations(sub_arange, cols_count):
+                                if not np.any(
+                                    np.all(
+                                        submatrix[:, comb_cols] == row[np.array(comb_cols)],
+                                        axis=1,
+                                    )
+                                ):
+                                    has_pattern = False
+                                    break
+
+                            if not has_pattern:
                                 break
 
-                        if not has_pattern:
-                            break
-
-                    if has_pattern:
-                        num += 1
+                        if has_pattern:
+                            num += 1
 
     return num

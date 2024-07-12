@@ -128,7 +128,7 @@ def test_example2():
     print()
 
 
-def run(test_id : int):
+def test_run(test_id : int):
     if test_id == 1:
         print("TEST IDENTITY")
 
@@ -149,7 +149,7 @@ def run(test_id : int):
 
 def run_all_tests():
     for test_id in range(1, 5):
-        run(test_id)
+        test_run(test_id)
 
     test_example1()
     test_example2()
